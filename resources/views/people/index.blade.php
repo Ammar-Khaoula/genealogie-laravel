@@ -23,6 +23,7 @@
                 <th class="p-3 mb-2 bg-black text-white">Nom-Prénom</th>
                 <th class="p-3 mb-2 bg-black text-white">Nom De Naissance</th>
                 <th class="p-3 mb-2 bg-black text-white">Pseudo</th>
+                <th class="p-3 mb-2 bg-black text-white">Date de naissance</th>
                 <th class="p-3 mb-2 bg-black text-white">Créateur</th>
                 <th class="p-3 mb-2 bg-black text-white">Actions</th>
             </tr>
@@ -33,6 +34,7 @@
                     <td> {{ $person->last_name }} {{ $person->first_name }}</td>
                     <td>{{ $person->birth_name }} </td>
                     <td>{{ $person->middle_names }}</td>
+                    <td>{{ $person->date_of_birth }}</td>
                     <td>{{ $person->creator->name }}</td>
                     <td>
                         <a href="{{ route('people.show', $person->id) }}" class="btn btn-info">Voir</a>

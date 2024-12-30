@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
+use App\Models\Person;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfileController;
@@ -35,5 +37,29 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/people/{id}', [PersonController::class, 'show'])->name('people.show');
     Route::post('/people', [PersonController::class, 'store'])->name('people.store');
 });
+
+
+Route::get('/test-degree', function () {
+    DB::enableQueryLog();
+
+    // Start timing
+    $timestart = microtime(true);
+
+    // Find the person 84
+    $person = Person::findOrFail(84);
+    $degree = $person->getDegreeWith(1265);
+
+    // Elapsed time and number of SQL queries
+    $time_elapsed = microtime(true) - $timestart;
+    $query_count = count(DB::getQueryLog());
+
+    return response()->json([
+        "degree" => $degree['degree'] ?? false,
+        "path" => $degree['path'] ?? [],
+        "time" => $time_elapsed,
+        "nb_queries" => $query_count,
+    ]);
+});
+
 
 require __DIR__.'/auth.php';

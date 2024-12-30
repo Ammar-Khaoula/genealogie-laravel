@@ -36,8 +36,25 @@ class PersonController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'middle_names' => 'nullable|string|max:255',
+            'birth_name' => 'nullable|string|max:255',
             'date_of_birth' => 'nullable|date',
         ]);
+
+        $validated['first_name'] = ucfirst(strtolower($validated['first_name']));
+        $validated['last_name'] = strtoupper($validated['last_name']);
+
+        $validated['birth_name'] = isset($validated['birth_name']) && $validated['birth_name']
+        ? strtoupper($validated['birth_name'])
+        : strtoupper($validated['last_name']);
+
+        $validated['middle_names'] = isset($validated['middle_names']) && $validated['middle_names']
+        ? collect(explode(',', $validated['middle_names']))
+            ->map(fn($name) => ucfirst(strtolower(trim($name))))
+            ->implode(', ')
+        : null;
+
+        $validated['date_of_birth'] = $validated['date_of_birth'] ?? null;
 
         $validated['created_by'] = auth()->id();
         try {
@@ -51,4 +68,5 @@ class PersonController extends Controller
                 return redirect()->route('people.create')->with('error', 'Une erreur est survenue lors de la création de la personne.');
             }
     }
+
 }

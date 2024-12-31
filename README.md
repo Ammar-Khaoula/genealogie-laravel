@@ -1,66 +1,135 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Site de Généalogie
 
-## About Laravel
+Un site interactif pour construire, visualiser et gérer des arbres généalogiques en collaboration avec une communauté.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Prérequis
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.x ou supérieur.
+- Composer pour la gestion des dépendances.
+- Laravel Framework version 10.x ou supérieur.
+- MySQL (ou tout autre SGBD compatible avec Laravel).
+- Node.js et npm pour la gestion des actifs front-end.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Mettez en place la base de données
 
-## Learning Laravel
+```bash
+  php artisan migrate
+``` 
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Lancez le serveur de développement 
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+  php artisan serve
+``` 
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Exemple de Fichier .env
 
-## Laravel Sponsors
+```bash
+APP_NAME=genealogie-laravel
+APP_ENV=local
+APP_KEY=base64:VotreCleGenerée
+APP_DEBUG=true
+APP_URL=http://localhost
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=genealogie
+DB_USERNAME=root
+DB_PASSWORD=root
 
-### Premium Partners
+``` 
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Partie3: Concevez la structure d'une base de données répondant au problème
+- dbdiagram.io
 
-## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+![Untitled](https://github.com/user-attachments/assets/3c97adab-51c9-482d-a702-c7ed4f841e2d)
 
-## Code of Conduct
+## Partie3: Décrivez comment les données évolues (insertions, updates) au fil des cas "Propositions de Modifications" et "Validation des Modifications" pour montrer que votre structure répond bien au problème.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 1. Cas : Propositions de Modifications
+Les utilisateurs proposent des modifications à une fiche ou ajoutent une relation familiale. Ces propositions sont enregistrées dans la table modification_proposals.
 
-## Security Vulnerabilities
+Exemple : Ajout d'une relation parent-enfant
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## - Étape 1 : Insertion
+1. L'utilisateur rose03 propose d'ajouter une relation parent-enfant entre Jean PERRET (id 1) et Rose PERRET (id 2).
+2. Une entrée est insérée dans la table modification_proposals :
 
-## License
+```bash
+INSERT INTO modification_proposals (user_id, type, target_id, new_value, status, created_at)
+VALUES (3, 'relationship_add', NULL, '{"parent_id":1,"child_id":2}', 'pending', NOW());
+``` 
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+  3. Le target_id est NULL car la relation n'existe pas encore.
+
+
+## - Étape 2 : Notification
+Les utilisateurs concernés (ex. jean01 et d'autres membres de la communauté) sont notifiés pour examiner la proposition.
+- Modification d'une fiche
+
+## - Étape 1 : Insertion
+
+1. L'utilisateur rose03 propose de modifier la date de naissance de Jean PERRET (id 1).
+2. Une entrée est insérée dans la table modification_proposals :
+
+```bash
+INSERT INTO modification_proposals (user_id, type, target_id, old_value, new_value, status, created_at)
+VALUES (3, 'person_update', 1, '{"date_of_birth":"1960-01-01"}', '{"date_of_birth":"1959-12-31"}', 'pending', NOW());
+``` 
+
+### 2. Cas : Validation des Modifications
+
+Les propositions de modification sont validées ou rejetées par la communauté via un processus de vote.
+
+## - Étape 1 : Vote sur une proposition
+
+- Les utilisateurs votent pour accepter ou rejeter une proposition. Les votes sont enregistrés dans la table votes.
+
+```bash
+INSERT INTO votes (user_id, proposal_id, vote, created_at)
+VALUES (4, 1, 'accept', NOW()),
+       (5, 1, 'accept', NOW()),
+       (6, 1, 'reject', NOW());
+``` 
+
+## - Étape 2 : Décision
+- Une fois qu'au moins 3 votes sont enregistrés (acceptations ou rejets), la proposition est traitée :
+     - Si 3 votes sont "accept", la modification est appliquée.
+     - Si 3 votes sont "reject", la modification est refusée.
+
+## - Étape 3 : Application de la modification
+
+- Si Acceptée :
+1.  Pour un ajout de relation:
+
+```bash
+INSERT INTO relationships (created_by, parent_id, child_id, created_at)
+VALUES (3, 1, 2, NOW());
+``` 
+
+2. Pour une mise à jour de fiche :
+
+```bash
+UPDATE people
+SET date_of_birth = '1959-12-31', updated_at = NOW()
+WHERE id = 1;
+``` 
+3. La proposition est mise à jour:
+
+```bash
+UPDATE modification_proposals
+SET status = 'accepted', updated_at = NOW()
+WHERE id = 1;
+``` 
+
+- Si Refusée  :
+1.  La proposition est marquée comme refusée :
+
+```bash
+UPDATE modification_proposals
+SET status = 'rejected', updated_at = NOW()
+WHERE id = 1;
+``` 
